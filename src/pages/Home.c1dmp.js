@@ -1,39 +1,59 @@
 import wixData from 'wix-data';
 
+let allMentors = [];
+
 $w.onReady(function () {
     loadMentors();
 
-    // Search function triggered when user types
+    // Search event
     $w("#searchInput").onInput(() => {
-        let searchValue = $w("#searchInput").value;
-        loadMentors(searchValue);
+        let searchValue = $w("#searchInput").value.trim();
+        if (searchValue === "") {
+            loadMentors();
+        } else {
+            searchMentors(searchValue);
+        }
     });
 });
 
-// Function to load mentors (optionally filtered)
-function loadMentors(searchText = "") {
-    let query = wixData.query('Mentors');
-
-    if (searchText.trim() !== "") {
-        query = query.contains('name', searchText);
-    }
-
-    query.find()
+// Load all mentors and display them in the boxes
+function loadMentors() {
+    wixData.query('Mentors')
+        .find()
         .then((results) => {
-            if (results.items.length > 0) {
-                $w("#repeater1").data = results.items;
-            } else {
-                $w("#repeater1").data = [];
-            }
+            allMentors = results.items;
+            displayMentors(allMentors);
         })
         .catch((err) => {
             console.log(err);
         });
 }
 
-// When each repeater item is ready, bind the data
-export function repeater1_itemReady($item, itemData, index) {
-    $item("#nameText").text = itemData.name;
-    $item("#designationText").text = itemData.designation;
-    $item("#mentorImage").src = itemData.image;
+// Search mentors by name
+function searchMentors(searchValue) {
+    let filteredMentors = allMentors.filter(mentor => mentor.name.toLowerCase().includes(searchValue.toLowerCase()));
+    displayMentors(filteredMentors);
+}
+
+// Show mentors in your boxes
+function displayMentors(mentors) {
+    let boxIds = ["#box51", "#box50", "#box49", "#box48", "#box47", "#box46"];
+    
+    // First hide all boxes
+    boxIds.forEach(boxId => {
+        $w(boxId).collapse();
+    });
+
+    // Display mentors in the available boxes
+    for (let i = 0; i < mentors.length && i < boxIds.length; i++) {
+        let box = $w(boxIds[i]);
+        let mentor = mentors[i];
+
+        // Update box content - you need to have these elements inside each box
+        box("#nameText").text = mentor.name;
+        box("#designationText").text = mentor.designation;
+        box("#mentorImage").src = mentor.image;
+
+        box.expand();
+    }
 }
