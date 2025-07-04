@@ -1,18 +1,29 @@
-// Velo API Reference: https://www.wix.com/velo/reference/api-overview/introduction
-
 import wixData from 'wix-data';
 
 $w.onReady(function () {
     loadMentors();
+
+    // Search function triggered when user types
+    $w("#searchInput").onInput(() => {
+        let searchValue = $w("#searchInput").value;
+        loadMentors(searchValue);
+    });
 });
 
-function loadMentors() {
-    wixData.query('Mentors') // collection name
-        .find()
+// Function to load mentors (optionally filtered)
+function loadMentors(searchText = "") {
+    let query = wixData.query('Mentors');
+
+    if (searchText.trim() !== "") {
+        query = query.contains('name', searchText);
+    }
+
+    query.find()
         .then((results) => {
             if (results.items.length > 0) {
-                let items = results.items;
-                $w("#repeater1").data = items;
+                $w("#repeater1").data = results.items;
+            } else {
+                $w("#repeater1").data = [];
             }
         })
         .catch((err) => {
@@ -20,15 +31,9 @@ function loadMentors() {
         });
 }
 
-// When the repeater item is ready
+// When each repeater item is ready, bind the data
 export function repeater1_itemReady($item, itemData, index) {
-    $item("#nameText").text = itemData.name; // connect to text inside the box
+    $item("#nameText").text = itemData.name;
     $item("#designationText").text = itemData.designation;
-    $item("#descriptionText").text = itemData.description;
-    $item("#bioText").text = itemData.bio;
-    $item("#availabilityText").text = itemData.availability;
-    $item("#whoShouldText").text = itemData['whoShouldReachOutToYou'];
     $item("#mentorImage").src = itemData.image;
-    $item("#linkedinButton").link = itemData['linkedinURL'];
-    $item("#contactButton").link = itemData['contactURL'];
 }
