@@ -1,30 +1,28 @@
 
-
+     
 import { secrets } from 'wix-secrets-backend.v2';
+import axios from 'axios';
 
 export async function setGuestlist(email, nickname) {
-     const API_KEY = await secrets.getSecretValue("kGyAO34s4Q4Qv544");
-     const SPACE_ID = await secrets.getSecretValue("Yt32dlYXKfLgGkuI\\nishad");
+    const API_KEY = await secrets.getSecretValue("kGyAO34s4Q4Qv544");
+    const SPACE_ID = await secrets.getSecretValue("Yt32dlYXKfLgGkuI\\nishad");
+
+    console.log("API Key:", API_KEY.value);
+    console.log("Space ID:", SPACE_ID.value);
+    console.log("Adding user to Gather:", email, nickname);
 
     try {
-        const response = await fetch("https://api.gather.town/api/setEmailGuestlist", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                apiKey: API_KEY.value,
-                spaceId: SPACE_ID.value,
-                guestlist: { [email]: { name: nickname, role: "guest" } },
-                overwrite: false
-            })
+        const response = await axios.post("https://api.gather.town/api/setEmailGuestlist", {
+            apiKey: API_KEY.value,
+            spaceId: SPACE_ID.value,
+            guestlist: { [email]: { name: nickname, role: "guest" } },
+            overwrite: false
+        }, {
+            headers: { 'Content-Type': 'application/json' }
         });
 
-        if (response.ok) {
-            const data = await response.json();
-            console.log('Guest list updated successfully:', data);
-        } else {
-            console.error('Error from Gather API:', await response.text());
-        }
+        console.log('Guest list updated successfully:', response.data);
     } catch (error) {
-        console.error('Fetch error:', error.message);
+        console.error('Error setting guest list:', error.response ? error.response.data : error.message);
     }
 }
