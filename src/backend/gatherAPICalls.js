@@ -3,7 +3,6 @@ import { secrets } from 'wix-secrets-backend.v2';
 export async function setGuestlist(email, nickname) {
     const API_KEY = await secrets.getSecretValue("kGyAO34s4Q4Qv544");
     const SPACE_ID = await secrets.getSecretValue("Yt32dlYXKfLgGkuI\\nishad");
-
     try {
         const response = await fetch("https://api.gather.town/api/setEmailGuestlist", {
             method: 'POST',
@@ -22,7 +21,7 @@ export async function setGuestlist(email, nickname) {
         } else {
             console.error('Error from Gather API:', await response.text());
         }
-    } catch (error) {s
+    } catch (error) {
         console.error('Fetch error:', error.message);
     }
 }
