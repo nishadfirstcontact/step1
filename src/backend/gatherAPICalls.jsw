@@ -4,8 +4,9 @@ import { secrets } from 'wix-secrets-backend.v2';
 import axios from 'axios';
 
 export async function setGuestlist(email, nickname) {
-    const API_KEY = await secrets.getSecretValue("kGyAO34s4Q4Qv544");
-    const SPACE_ID = await secrets.getSecretValue("Yt32dlYXKfLgGkuI\\nishad");
+const API_KEY = await secrets.getSecretValue("GATHER_API_KEY");
+const SPACE_ID = await secrets.getSecretValue("GATHER_SPACE_ID");
+
 
     console.log("API Key:", API_KEY.value);
     console.log("Space ID:", SPACE_ID.value);
