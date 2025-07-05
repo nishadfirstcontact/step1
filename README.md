@@ -4,6 +4,9 @@ This repo is part of Git Integration & Wix CLI, a set of tools that allows you t
 
 Connect your site to GitHub, develop in your favorite IDE, test your code in real time, and publish your site from the command line.
 
+
+her is the updated readme
+
 ## Set up this repository in your IDE
 This repo is connected to a Wix site. That site tracks this repo's default branch. Any code committed and pushed to that branch from your local IDE appears on the site.
 
