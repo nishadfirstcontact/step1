@@ -30,7 +30,7 @@ $w.onReady(function () {
 
     // When dataset refreshes after search
     $w('#dataset1').onReady(() => {
-        let searchValue = $w('#text1').value.trim().toLowerCase();
+        let searchValue = $w('#input1').value.trim().toLowerCase();
 
         if (searchValue === '') {
             return;
