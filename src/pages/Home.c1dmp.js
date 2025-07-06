@@ -1,44 +1,60 @@
 import wixData from 'wix-data';
 
 $w.onReady(function () {
-
     $w('#text1').onInput(() => {
         let searchValue = $w('#text1').value.trim().toLowerCase();
 
-        // Reset all boxes to white
-        $w('#repeater1').forEachItem(($item, itemData) => {
-            $item('#box182').style.backgroundColor = 'white';
-        });
-
+        // Apply dataset filter
         if (searchValue === '') {
-            // If search is empty, do nothing
-            return;
-        }
-
-        let found = false;
-
-        // Search and highlight the matching mentor
-        $w('#repeater1').forEachItem(($item, itemData) => {
-            if (itemData.name.toLowerCase().includes(searchValue)) {
-
-                // Highlight the matched box
-                $item('#box182').style.backgroundColor = '#7f5af0'; // Dark Purple
-
-                // Show mentor details in the right side big box
-                $w('#box188').text = itemData.name;          // Mentor Name
-                $w('#box189').src = itemData.image;          // Mentor Image
-                $w('#text108').text = itemData.description;  // Mentor Description
-
-                found = true;
-                return; // Stop at the first match
-            }
-        });
-
-        if (!found) {
-            // Optional: Clear detail box if no match found nishad
-            $w('#box188').text = '';
-            $w('#box189').src = '';
-            $w('#text108').text = '';
+            // Show all mentors when input is empty
+            $w('#dataset1').setFilter(wixData.filter());
+        } else {
+            // Filter dataset by name
+            $w('#dataset1').setFilter(wixData.filter()
+                .contains('name', searchValue)
+            );
         }
     });
+
+    // When each item is loaded in the repeater
+    $w('#repeater1').onItemReady(($item, itemData) => {
+
+        // Click event for manual selection (optional)
+        $item('#box182').onClick(() => {
+            highlightItem($item, itemData);
+        });
+    });
+
+    // Watch for dataset changes (when search happens)
+    $w('#dataset1').onReady(() => {
+        let searchValue = $w('#text1').value.trim().toLowerCase();
+
+        if (searchValue === '') {
+            return; // No need to highlight anything if input is empty
+        }
+
+        // Automatically highlight the first match after filtering
+        $w('#repeater1').forEachItem(($item, itemData) => {
+            if (itemData.name.toLowerCase().includes(searchValue)) {
+                highlightItem($item, itemData);
+                return false; // stop after first match
+            }
+        });
+    });
+
+    // Function to highlight and update right-side details
+    function highlightItem($item, itemData) {
+        // Reset all boxes to white
+        $w('#repeater1').forEachItem(($innerItem) => {
+            $innerItem('#box182').style.backgroundColor = 'white';
+        });
+
+        // Highlight the selected item
+        $item('#box182').style.backgroundColor = '#7f5af0';
+
+        // Show mentor details on the right hello
+        $w('#box188').text = itemData.name;
+        $w('#box189').src = itemData.image;
+        $w('#text108').text = itemData.description;
+    }
 });
