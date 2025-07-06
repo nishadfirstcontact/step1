@@ -1,59 +1,46 @@
 import wixData from 'wix-data';
 
-let allMentors = [];
+let selectedMentorId = null;
 
 $w.onReady(function () {
-    loadMentors();
 
-    // Search event
-    $w("#searchInput").onInput(() => {
-        let searchValue = $w("#searchInput").value.trim();
-        if (searchValue === "") {
-            loadMentors();
+    // Live Search Functionality
+    $w('#text1').onInput(() => {
+        let searchValue = $w('#text1').value;
+
+        if (searchValue === '') {
+            // Show all mentors when input is empty
+            $w('#dataset1').setFilter(wixData.filter());
         } else {
-            searchMentors(searchValue);
+            // Filter mentors by name
+            $w('#dataset1').setFilter(wixData.filter()
+                .contains('name', searchValue)
+            );
         }
     });
-});
 
-// Load all mentors and display them in the boxes
-function loadMentors() {
-    wixData.query('Mentors')
-        .find()
-        .then((results) => {
-            allMentors = results.items;
-            displayMentors(allMentors);
-        })
-        .catch((err) => {
-            console.log(err);
+    // Handle Click on Repeater Items
+    $w('#repeater1').onItemReady(($item, itemData, index) => {
+
+        // Reset background color initially
+        $item('#box182').style.backgroundColor = 'white';
+
+        // Click event for each mentor box
+        $item('#box182').onClick(() => {
+            selectedMentorId = itemData._id;
+
+            // Reset all boxes to white
+            $w('#repeater1').forEachItem(($innerItem, innerItemData) => {
+                $innerItem('#box182').style.backgroundColor = 'white';
+            });
+
+            // Highlight selected box
+            $item('#box182').style.backgroundColor = '#7f5af0'; // dark purple
+
+            // Show mentor details in the right box
+            $w('#box187').text = itemData.name;          // Mentor Name
+            $w('#box189').src = itemData.image;          // Mentor Image
+            $w('#text108').text = itemData.description;  // Mentor Description
         });
-}
-
-// Search mentors by name
-function searchMentors(searchValue) {
-    let filteredMentors = allMentors.filter(mentor => mentor.name.toLowerCase().includes(searchValue.toLowerCase()));
-    displayMentors(filteredMentors);
-}
-
-// Show mentors in your boxes
-function displayMentors(mentors) {
-    let boxIds = ["#box51", "#box50", "#box49", "#box48", "#box47", "#box46"];
-    
-    // First hide all boxes
-    boxIds.forEach(boxId => {
-        $w(boxId).collapse();
     });
-
-    // Display mentors in the available boxes
-    for (let i = 0; i < mentors.length && i < boxIds.length; i++) {
-        let box = $w(boxIds[i]);
-        let mentor = mentors[i];
-
-        // Update box content - you need to have these elements inside each box
-        box("#nameText").text = mentor.name;
-        box("#designationText").text = mentor.designation;
-        box("#mentorImage").src = mentor.image;
-
-        box.expand();
-    }
-}
+});
