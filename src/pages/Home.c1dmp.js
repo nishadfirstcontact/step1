@@ -52,7 +52,7 @@ $w.onReady(function () {
         // Highlight the selected item
         $item('#box182').style.backgroundColor = '#7f5af0';
 
-        // Show mentor details on the right hello
+        // Show mentor details on the right hello mone
         $w('#box188').text = itemData.name;
         $w('#box189').src = itemData.image;
         $w('#text108').text = itemData.description;
