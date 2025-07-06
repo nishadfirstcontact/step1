@@ -82,6 +82,6 @@ function showMentorDetails(itemData) {
     $w('#text108').text = itemData.description;          // Mentor Description
     $w('#text106').text = itemData.bio;                  // Mentor Bio
     $w('#text102').text = itemData.availability;         // Mentor Availability
-    $w('#text104').text = itemData.whoShouldReachOutToYou; // Who Should Reach Out
+    $w('#text104').text = itemData.Who Should Reach; // Who Should Reach Out
     $w('#imageX13').src = itemData.image;                // Mentor Image
 }
