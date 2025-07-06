@@ -4,7 +4,7 @@ $w.onReady(function () {
 
     // Search button click event
     $w('#vectorImage17').onClick(() => {
-        let searchValue = $w('#text1').value.trim().toLowerCase();
+        let searchValue = $w('#input1').value.trim().toLowerCase();
 
         if (searchValue === '') {
             $w('#dataset1').setFilter(wixData.filter());
