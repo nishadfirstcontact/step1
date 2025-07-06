@@ -1,60 +1,62 @@
 import wixData from 'wix-data';
 
 $w.onReady(function () {
-    // Click event on search button
+
+    // Search button click event
     $w('#vectorImage17').onClick(() => {
         let searchValue = $w('#text1').value.trim().toLowerCase();
 
-        // Apply dataset filter
         if (searchValue === '') {
-            // Show all mentors if search box is empty
             $w('#dataset1').setFilter(wixData.filter());
         } else {
-            // Filter dataset by name
             $w('#dataset1').setFilter(wixData.filter()
                 .contains('name', searchValue)
+                .or(wixData.filter().contains('designation', searchValue))
             );
         }
     });
 
-    // When each item is loaded in the repeater
+    // Repeater item ready
     $w('#repeater1').onItemReady(($item, itemData) => {
-        // Click event on each box (optional manual selection)
+
+        // Reset background initially
+        $item('#box182').style.backgroundColor = 'white';
+
+        // Click event for each item
         $item('#box182').onClick(() => {
             highlightItem($item, itemData);
         });
     });
 
-    // When the dataset finishes loading after filter
+    // When dataset refreshes after search
     $w('#dataset1').onReady(() => {
         let searchValue = $w('#text1').value.trim().toLowerCase();
 
         if (searchValue === '') {
-            return; // No highlight if input is empty
+            return;
         }
 
-        // Automatically highlight the first matching item
+        // Auto highlight first match
         $w('#repeater1').forEachItem(($item, itemData) => {
-            if (itemData.name.toLowerCase().includes(searchValue)) {
+            if (itemData.name.toLowerCase().includes(searchValue) || itemData.designation.toLowerCase().includes(searchValue)) {
                 highlightItem($item, itemData);
-                return false; // Stop after first match
+                return false; // stop after first match
             }
         });
     });
 
-    // Function to highlight item and display details
+    // Highlight function
     function highlightItem($item, itemData) {
-        // Reset all boxes to white
         $w('#repeater1').forEachItem(($innerItem) => {
             $innerItem('#box182').style.backgroundColor = 'white';
         });
 
-        // Highlight the selected item
-        $item('#box182').style.backgroundColor = '#7f5af0'; // dark purple
+        $item('#box182').style.backgroundColor = '#7f5af0';
 
-        // Show mentor details in the right box hehe
-        $w('#box188').text = itemData.name;
-        $w('#box189').src = itemData.image;
+        // Update right side details
+        $w('#text110').text = itemData.name;
+        $w('#text109').text = itemData.designation;
         $w('#text108').text = itemData.description;
+        $w('#box189').src = itemData.image;
     }
 });
