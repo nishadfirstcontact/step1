@@ -24,6 +24,6 @@ const SPACE_ID = await secrets.getSecretValue("GATHER_SPACE_ID");
 
         console.log('Guest list updated successfully:', response.data);
     } catch (error) {
-        console.error('Error setting guest list:', error.response ? error.response.data : error.message);
+        console.error('Error setting guest list please wait:', error.response ? error.response.data : error.message);
     }
 }
