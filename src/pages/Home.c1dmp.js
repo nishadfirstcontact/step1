@@ -7,56 +7,74 @@ $w.onReady(function () {
         selectFirstMentor();
     });
 
-    // LIVE FILTERING ON INPUT
     $w('#input1').onInput((event) => {
         performSearch(event.target.value.trim());
     });
 
-    // On Item Ready
     $w('#repeater1').onItemReady(($item, itemData, index) => {
         $item('#box182').style.backgroundColor = 'white';
 
         $item('#box182').onClick(() => {
             selectedMentorId = itemData._id;
 
-            // Reset all styles
             $w('#repeater1').forEachItem(($innerItem, innerItemData) => {
                 $innerItem('#box182').style.backgroundColor = 'white';
             });
 
-            // Highlight selected
             $item('#box182').style.backgroundColor = '#7f5af0';
-
-            // Show mentor details
             showMentorDetails(itemData);
-
-            // Move clicked item to top
-            moveMentorToTop(itemData._id);
         });
     });
 });
 
-// FILTER FUNCTION
 function performSearch(searchValue) {
-    const filter = searchValue
+    const baseFilter = searchValue
         ? wixData.filter().contains("name", searchValue)
         : wixData.filter();
 
-    $w('#dataset1').setFilter(filter)
-        .then(() => {
-            $w('#repeater1').forEachItem(($item, itemData, index) => {
-                if (index === 0) {
-                    selectedMentorId = itemData._id;
-                    $item('#box182').style.backgroundColor = '#7f5af0';
-                    showMentorDetails(itemData);
-                } else {
-                    $item('#box182').style.backgroundColor = 'white';
-                }
+    $w('#dataset1').setFilter(baseFilter)
+        .then(() => $w('#dataset1').getItems(0, 100))
+        .then(result => {
+            const items = result.items;
+
+            // Custom sorting: exact startsWith first, then contains
+            const sorted = items.sort((a, b) => {
+                const aName = a.name.toLowerCase();
+                const bName = b.name.toLowerCase();
+                const term = searchValue.toLowerCase();
+
+                const aStarts = aName.startsWith(term);
+                const bStarts = bName.startsWith(term);
+
+                if (aStarts && !bStarts) return -1;
+                if (!aStarts && bStarts) return 1;
+
+                const aContains = aName.includes(term);
+                const bContains = bName.includes(term);
+
+                if (aContains && !bContains) return -1;
+                if (!aContains && bContains) return 1;
+
+                return 0;
             });
+
+            // Reset the dataset with sorted items with priority by nishad
+            $w('#dataset1').setItems(sorted)
+                .then(() => {
+                    // Highlight first
+                    $w('#repeater1').forEachItem(($item, itemData, index) => {
+                        if (index === 0) {
+                            selectedMentorId = itemData._id;
+                            $item('#box182').style.backgroundColor = '#7f5af0';
+                            showMentorDetails(itemData);
+                        } else {
+                            $item('#box182').style.backgroundColor = 'white';
+                        }
+                    });
+                });
         });
 }
 
-// SHOW MENTOR DETAILS
 function showMentorDetails(itemData) {
     $w('#text110').text = itemData.name;
     $w('#text109').text = itemData.designation;
@@ -67,9 +85,7 @@ function showMentorDetails(itemData) {
     $w('#imageX13').src = itemData.image;
 }
 
-// AUTO SELECT FIRST ON LOAD
 function selectFirstMentor() {
-    const items = $w('#dataset1').getCurrentItem();
     $w('#repeater1').forEachItem(($item, itemData, index) => {
         if (index === 0) {
             $item('#box182').style.backgroundColor = '#7f5af0';
@@ -78,18 +94,4 @@ function selectFirstMentor() {
             $item('#box182').style.backgroundColor = 'white';
         }
     });
-}
-
-// MOVE SELECTED TO TOP Nishad
-function moveMentorToTop(idToMove) {
-    $w('#dataset1').getItems(0, 100)
-        .then(result => {
-            let items = result.items;
-            const index = items.findIndex(item => item._id === idToMove);
-            if (index > -1) {
-                const [selected] = items.splice(index, 1);
-                items.unshift(selected);
-                $w('#dataset1').setItems(items);
-            }
-        });
 }
