@@ -97,3 +97,13 @@ function highlightFirstItem(id) {
         }
     });
 }
+$w.onReady(() => {
+    const box = $w('#box98');
+
+    box.onViewportEnter(() => {
+        // Enable scroll by default – no need to trigger
+    });
+
+    // Optional: Hide scrollbar using CSS
+    $w('#box98').style.overflowX = 'auto'; // Enables horizontal scroll
+});
