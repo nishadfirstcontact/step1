@@ -98,12 +98,20 @@ function highlightFirstItem(id) {
     });
 }
 $w.onReady(() => {
-    const box = $w('#box98');
+    // Enable horizontal scroll and hide scrollbar
+    const repeater = $w("#repeater2");
 
-    box.onViewportEnter(() => {
-        // Enable scroll by default – no need to trigger
-    });
-
-    // Optional: Hide scrollbar using CSS
-    $w('#box98').style.overflowX = 'auto'; // Enables horizontal scroll
+    // Optional: dynamically inject CSS to hide scrollbar
+    const style = document.createElement("style");
+    style.innerHTML = `
+        #repeater2::-webkit-scrollbar {
+            display: none;
+        }
+        #repeater2 {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+            overflow-x: auto; /* still allow horizontal scroll */
+        }
+    `;
+    document.head.appendChild(style);
 });
