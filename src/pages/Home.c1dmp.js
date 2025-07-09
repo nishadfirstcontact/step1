@@ -79,6 +79,6 @@ function showMentorDetails(itemData) {
     $w('#text108').text = itemData.description || '';
     $w('#text106').text = itemData.bio || '';
     $w('#text102').text = itemData.availability || '';
-    $w('#text104').text = itemData["Who Should Reach"] || ''; // Column name from collection by nishad
+    $w('#text104').text = itemData["Who Should Reach"] || ''; // Column name from collection by nishads
     $w('#imageX13').src = itemData.image || '';
 }
