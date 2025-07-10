@@ -93,7 +93,7 @@ function showMentorDetails(itemData) {
     $w('#text124').text = itemData.description;
     $w('#text122').text = itemData.bio;
     $w('#text188').text = itemData.availability;
-    $w('#imagex17').src = itemData.image;
+    $w('#imageX17').src = itemData.image;
 }
 
 function highlightFirstItem(id) {
