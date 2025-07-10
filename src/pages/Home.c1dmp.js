@@ -86,6 +86,14 @@ function showMentorDetails(itemData) {
     $w('#text102').text = itemData.availability;
     $w('#text104').text = itemData["Who Should Reach"];
     $w('#imageX13').src = itemData.image;
+
+
+    $w('#text126').text = itemData.name;
+    $w('#text125').text = itemData.designation;
+    $w('#text124').text = itemData.description;
+    $w('#text122').text = itemData.bio;
+    $w('#text188').text = itemData.availability;
+    $w('#imagex17').src = itemData.image;
 }
 
 function highlightFirstItem(id) {
