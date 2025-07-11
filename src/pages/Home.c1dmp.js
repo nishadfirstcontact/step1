@@ -32,17 +32,33 @@ $w.onReady(function () {
     // Load all initially and select first
     loadAllMentors();
 
-    // Inject CSS to hide vertical scrollbar on #box219
+    // Apply custom scroll styling to #box264 (scroll container)
     const style = document.createElement("style");
     style.innerHTML = `
-        #box219::-webkit-scrollbar {
+        /* --- Option 1: HIDE scrollbar --- */
+        #box264::-webkit-scrollbar {
             display: none;
         }
-        #box219 {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;     /* Firefox */
-            overflow-y: auto;          /* Allow scroll without scrollbar */
+        #box264 {
+            -ms-overflow-style: none;   /* IE and Edge */
+            scrollbar-width: none;      /* Firefox */
+            overflow-y: auto;           /* Enable scroll */
         }
+
+        /* --- Option 2: VISIBLE styled scrollbar (comment above and uncomment below if needed) ---
+        #box264::-webkit-scrollbar {
+            width: 6px;
+        }
+        #box264::-webkit-scrollbar-thumb {
+            background-color: #7f5af0;
+            border-radius: 6px;
+        }
+        #box264 {
+            scrollbar-width: thin;
+            scrollbar-color: #7f5af0 transparent;
+            overflow-y: auto;
+        }
+        */
     `;
     document.head.appendChild(style);
 });
@@ -72,6 +88,7 @@ function performSearch(searchValue) {
                 return;
             }
 
+            // Prioritize matching mentors at top
             const matching = allMentors.filter(m =>
                 m.name.toLowerCase().includes(searchValue.toLowerCase())
             );
@@ -80,9 +97,10 @@ function performSearch(searchValue) {
                 !m.name.toLowerCase().includes(searchValue.toLowerCase())
             );
 
-            const sorted = [...matching, ...rest];
+            const sorted = [...matching, ...rest]; // matching items first
             $w('#repeater1').data = sorted;
 
+            // Show first match details
             if (matching.length > 0) {
                 showMentorDetails(matching[0]);
                 highlightFirstItem(matching[0]._id);
@@ -91,7 +109,7 @@ function performSearch(searchValue) {
 }
 
 function showMentorDetails(itemData) {
-    // Desktop view
+    // Desktop View
     $w('#text110').text = itemData.name;
     $w('#text109').text = itemData.designation;
     $w('#text108').text = itemData.description;
@@ -100,7 +118,7 @@ function showMentorDetails(itemData) {
     $w('#text104').text = itemData["Who Should Reach"];
     $w('#imageX13').src = itemData.image;
 
-    // Mobile view
+    // Mobile View
     $w('#text126').text = itemData.name;
     $w('#text125').text = itemData.designation;
     $w('#text124').text = itemData.description;
