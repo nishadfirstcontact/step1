@@ -115,7 +115,7 @@ function showMentorDetails(itemData) {
     $w('#text108').text = itemData.description;
     $w('#text106').text = itemData.bio;
     $w('#text102').text = itemData.availability;
-    $w('#text104').text = itemData["Who Should Reach"];
+    $w('#text104').text = itemData.whoShouldReach;
     $w('#imageX13').src = itemData.image;
 
     // Mobile View
