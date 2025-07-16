@@ -5,18 +5,19 @@ import { getSecret } from 'wix-secrets-backend';
 export async function get_fulldata(request) {
     try {
         const clientKey = request.headers["x-api-key"];
+        console.log("🔐 Received API key:", clientKey);
+
         const storedKey = await getSecret("SyncAPIKey");
+        console.log("🔐 Stored API key from secret:", storedKey);
 
         if (!clientKey || clientKey !== storedKey) {
-            console.log("❌ API Key Mismatch or Missing");
+            console.log("❌ API Key mismatch");
             return unauthorized("Invalid API Key");
         }
 
-        const results = await wixData.query("FullData")
-            .limit(100)
-            .find();
+        const results = await wixData.query("FullData").limit(100).find();
+        console.log("✅ Query successful. Total items:", results.totalCount);
 
-        console.log("✅ Query success", results.totalCount);
         return ok({ members: results.items });
 
     } catch (err) {
