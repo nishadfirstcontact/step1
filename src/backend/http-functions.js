@@ -4,11 +4,12 @@ import { getSecret } from 'wix-secrets-backend';
 
 export async function get_fulldata(request) {
     try {
-        const clientKey = request.headers["x-api-key"];
-        console.log("🔐 Received API key:", clientKey);
-
+        // Safe header access
+        const clientKey = request.headers.get("x-api-key");
         const storedKey = await getSecret("SyncAPIKey");
-        console.log("🔐 Stored API key from secret:", storedKey);
+
+        console.log("🔐 Client Key:", clientKey);
+        console.log("🔐 Stored Key:", storedKey);
 
         if (!clientKey || clientKey !== storedKey) {
             console.log("❌ API Key mismatch");
@@ -16,12 +17,12 @@ export async function get_fulldata(request) {
         }
 
         const results = await wixData.query("FullData").limit(100).find();
-        console.log("✅ Query successful. Total items:", results.totalCount);
 
+        console.log("✅ Data fetched:", results.totalCount);
         return ok({ members: results.items });
 
     } catch (err) {
-        console.error("🔥 Server Error:", err.message, err.stack);
-        return serverError("Server error: " + err.message);
+        console.error("🔥 Server error:", err.message, err.stack);
+        return serverError("Internal error: " + err.message);
     }
 }
