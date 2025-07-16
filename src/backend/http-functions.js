@@ -1,28 +1,29 @@
-import { ok, unauthorized, serverError } from 'wix-http-functions';
 import wixData from 'wix-data';
-import { getSecret } from 'wix-secrets-backend';
+import { secrets } from 'wix-secrets-backend.v2';
+import axios from 'axios';
 
-export async function get_fulldata(request) {
-    try {
-        // Safe header access
-        const clientKey = request.headers.get("x-api-key");
-        const storedKey = await getSecret("SyncAPIKey");
+export async function syncAllFullDataToEditor() {
+    const secret = await secrets.getSecretValue("SyncAPIKey");
+    const API_KEY = secret.value;
 
-        console.log("🔐 Client Key:", clientKey);
-        console.log("🔐 Stored Key:", storedKey);
+    const editorEndpoint = "https://YOUR_EDITOR_SITE/_functions/receiveStudioMember"; // Replace this
 
-        if (!clientKey || clientKey !== storedKey) {
-            console.log("❌ API Key mismatch");
-            return unauthorized("Invalid API Key");
+    const result = await wixData.query("Members/FullData").limit(100).find();
+    const members = result.items;
+
+    for (let member of members) {
+        try {
+            const response = await axios.post(editorEndpoint, member, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': API_KEY
+                }
+            });
+            console.log(`✅ Synced: ${member.loginEmail}`);
+        } catch (err) {
+            console.error(`❌ Sync failed: ${member.loginEmail}`, err.response?.data || err.message);
         }
-
-        const results = await wixData.query("FullData").limit(100).find();
-
-        console.log("✅ Data fetched:", results.totalCount);
-        return ok({ members: results.items });
-
-    } catch (err) {
-        console.error("🔥 Server error:", err.message, err.stack);
-        return serverError("Internal error: " + err.message);
     }
+
+    return { status: "done", count: members.length };
 }
