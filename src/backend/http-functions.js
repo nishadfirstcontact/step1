@@ -8,6 +8,7 @@ export async function get_fulldata(request) {
         const storedKey = await getSecret("SyncAPIKey");
 
         if (!clientKey || clientKey !== storedKey) {
+            console.log("❌ API Key Mismatch or Missing");
             return unauthorized("Invalid API Key");
         }
 
@@ -15,9 +16,11 @@ export async function get_fulldata(request) {
             .limit(100)
             .find();
 
+        console.log("✅ Query success", results.totalCount);
         return ok({ members: results.items });
+
     } catch (err) {
-        console.error("Error occurred:", err);
+        console.error("🔥 Server Error:", err.message, err.stack);
         return serverError("Server error: " + err.message);
     }
 }
