@@ -1,5 +1,5 @@
 import wixData from 'wix-data';
-
+import { syncAllFullDataToEditor } from 'backend/syncToEditor.jsw';
 let selectedMentorId = null;
 
 $w.onReady(function () {
@@ -138,7 +138,6 @@ function highlightFirstItem(id) {
 }
 $w("#box264").style.backgroundColor = "#C7B6FF";
 
-import { syncAllFullDataToEditor } from 'backend/syncToEditor.jsw';
 
 $w.onReady(() => {
     syncAllFullDataToEditor()
