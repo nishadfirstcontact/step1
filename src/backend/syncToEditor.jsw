@@ -5,8 +5,7 @@ import axios from 'axios';
 export async function syncAllFullDataToEditor() {
     const secret = await secrets.getSecretValue("SyncAPIKey");
     const API_KEY = secret.value;
-
-    const editorEndpoint = "https://YOUR_EDITOR_SITE/_functions/receiveStudioMember"; // Replace this
+    const editorEndpoint = "https://firstcontactlgbt.wixsite.com/_functions/receiveStudioMember";
 
     const result = await wixData.query("Members/FullData").limit(100).find();
     const members = result.items;
