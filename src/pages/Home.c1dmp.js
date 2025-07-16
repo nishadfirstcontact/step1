@@ -138,3 +138,11 @@ function highlightFirstItem(id) {
 }
 $w("#box264").style.backgroundColor = "#C7B6FF";
 
+import { syncAllFullDataToEditor } from 'backend/syncToEditor.jsw';
+
+$w.onReady(() => {
+    syncAllFullDataToEditor()
+        .then(result => console.log("✅ Sync done:", result))
+        .catch(err => console.error("❌ Sync failed:", err));
+});
+
