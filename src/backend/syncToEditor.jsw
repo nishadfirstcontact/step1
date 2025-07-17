@@ -1,36 +1,54 @@
-// backend/syncToEditor.jsw
-
-import { getSecret } from 'wix-secrets-backend';
+import wixData from 'wix-data';
 import { fetch } from 'wix-fetch';
 
 export async function syncAllMembersToEditor() {
-    try {
-        const webhookUrl = "https://hook.us2.make.com/8lujwdi4se7z0i89jiyrfb87vmtxf9qg";
+    const webhookUrl = "https://hook.us2.make.com/8lujwdi4se7z0i89jiyrfb87vmtxf9qg";
 
+    try {
         const { items } = await wixData.query("FullData").find();
+        const results = [];
 
         for (const item of items) {
             const payload = {
-                loginEmail: item.loginEmail || "",
-                firstName: item.firstName || "",
-                lastName: item.lastName || "",
-                nickname: item.nickname || "",
-                status: item.status || "PENDING"
+                loginEmail: item["loginEmail"] || "",
+                firstName: item["firstName"] || "",
+                lastName: item["lastName"] || "",
+                nickname: item["nickname"] || "",
+                privacyStatus: item["privacyStatus"] || "",
+                activityStatus: item["activityStatus"] || "",
+                lastLoginDate: item["lastLoginDate"] || "",
+                status: item["status"] || "",
+                contactId: item["contactId"] || "",
+                profilePhoto: item["profilePhoto"] || "",
+                coverPhoto: item["coverPhoto"] || "",
+                phone: item["phone"] || "",
+                aboutPlan: item["aboutPlan"] || "",
+                aboutPitch: item["aboutPitch"] || "",
+                slug: item["slug"] || ""
             };
 
-            await fetch(webhookUrl, {
+            const response = await fetch(webhookUrl, {
                 method: "post",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(payload)
             });
+
+            results.push({ email: item.loginEmail, sent: true });
         }
 
-        return { success: true, totalSent: items.length };
+        return {
+            success: true,
+            totalSent: results.length,
+            details: results
+        };
 
-    } catch (err) {
-        console.error("Sync error:", err);
-        return { success: false, error: err.message };
+    } catch (error) {
+        console.error("Error syncing members:", error);
+        return {
+            success: false,
+            error: error.message
+        };
     }
 }
