@@ -1,5 +1,6 @@
 import wixData from 'wix-data';
-import { syncAllFullDataToEditor } from 'backend/syncToEditor.jsw';
+import { sendAllFullDataToMake } from 'backend/fullDataSender';
+
 let selectedMentorId = null;
 
 $w.onReady(function () {
@@ -140,13 +141,12 @@ $w("#box264").style.backgroundColor = "#C7B6FF";
 
 
 
-$w.onReady(() => {
-    syncAllFullDataToEditor()
-        .then(results => {
-            console.log("✅ Sync results:", results);
-        })
-        .catch(error => {
-            console.error("❌ Sync failed:", error);
-        });
+
+$w.onReady(function () {
+  $w('#sendButton').onClick(() => {
+    sendAllFullDataToMake()
+      .then(console.log)
+      .catch(console.error);
+  });
 });
 
