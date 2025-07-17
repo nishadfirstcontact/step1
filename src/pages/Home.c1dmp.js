@@ -1,5 +1,4 @@
 import wixData from 'wix-data';
-import { sendAllFullDataToMake } from 'backend/fullDataSender';
 
 let selectedMentorId = null;
 
