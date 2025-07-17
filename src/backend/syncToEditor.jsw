@@ -1,28 +1,26 @@
-import wixData from 'wix-data';
-import { secrets } from 'wix-secrets-backend.v2';
-import axios from 'axios';
+import { query } from 'wix-data';
+import { fetch } from 'wix-fetch';
 
 export async function syncAllFullDataToEditor() {
-    const secret = await secrets.getSecretValue("SyncAPIKey");
-    const API_KEY = secret.value;
     const editorEndpoint = "https://firstcontactlgbt.wixsite.com/_functions/receiveStudioMember";
+    const apiKey = "my-super-secret-api-key-12345"; // use the same key as editor
 
-    const result = await wixData.query("Members/FullData").limit(100).find();
-    const members = result.items;
+    // Step 1: Fetch all FullData
+    const { items } = await query("FullData").limit(1000).find();
 
-    for (let member of members) {
-        try {
-            const response = await axios.post(editorEndpoint, member, {
+    // Step 2: Push each item to Editor site
+    const results = await Promise.allSettled(
+        items.map(item => {
+            return fetch(editorEndpoint, {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': API_KEY
-                }
-            });
-            console.log(`✅ Synced: ${member.loginEmail}`);
-        } catch (err) {
-            console.error(`❌ Sync failed: ${member.loginEmail}`, err.response?.data || err.message);
-        }
-    }
+                    "Content-Type": "application/json",
+                    "x-api-key": apiKey
+                },
+                body: JSON.stringify(item)
+            }).then(res => res.json());
+        })
+    );
 
-    return { status: "done", count: members.length };
+    return results;
 }
