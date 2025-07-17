@@ -1,26 +1,29 @@
-import { query } from 'wix-data';
 import { fetch } from 'wix-fetch';
+import wixData from 'wix-data';
+import { getSecretValue } from 'wix-secrets-backend.v2';
 
 export async function syncAllFullDataToEditor() {
     const editorEndpoint = "https://firstcontactlgbt.wixsite.com/_functions/receiveStudioMember";
-    const apiKey = "my-super-secret-api-key-12345"; // use the same key as editor
+    const secret = await getSecretValue("SyncAPIKey");
 
-    // Step 1: Fetch all FullData
-    const { items } = await query("FullData").limit(1000).find();
+    const allItems = await wixData.query("FullData").find();
+    const key = secret.value;
 
-    // Step 2: Push each item to Editor site
-    const results = await Promise.allSettled(
-        items.map(item => {
-            return fetch(editorEndpoint, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-api-key": apiKey
-                },
-                body: JSON.stringify(item)
-            }).then(res => res.json());
-        })
-    );
+    let results = [];
+
+    for (let item of allItems.items) {
+        const response = await fetch(editorEndpoint, {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json",
+                "x-api-key": key
+            },
+            body: JSON.stringify(item)
+        });
+
+        const result = await response.json();
+        results.push(result);
+    }
 
     return results;
 }
