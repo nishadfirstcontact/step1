@@ -139,9 +139,14 @@ function highlightFirstItem(id) {
 $w("#box264").style.backgroundColor = "#C7B6FF";
 
 
+
 $w.onReady(() => {
     syncAllFullDataToEditor()
-        .then(result => console.log("✅ Sync done:", result))
-        .catch(err => console.error("❌ Sync failed:", err));
+        .then(results => {
+            console.log("✅ Sync results:", results);
+        })
+        .catch(error => {
+            console.error("❌ Sync failed:", error);
+        });
 });
 
