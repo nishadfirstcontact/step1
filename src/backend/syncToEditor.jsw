@@ -1,24 +1,37 @@
+import { getFullData } from 'backend/dataService'; // Assume you create this service to fetch data
 import { fetch } from 'wix-fetch';
 
-export async function sendAllFullDataToMake() {
-  const webhookURL = "https://hook.us2.make.com/8lujwdi4se7z0i89jiyrfb87vmtxf9qg";
+// Replace with your Make.com webhook
+const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/8lujwdi4se7z0i89jiyrfb87vmtxf9qg";
 
-  try {
-    const results = await wixData.query("FullData").find();
+export async function syncToEditor() {
+    try {
+        const data = await getFullData(); // You can also query directly here
+        const responses = [];
 
-    const allItems = results.items;
+        for (let item of data.items) {
+            const payload = {
+                loginEmail: item.loginEmail,
+                firstName: item.firstName,
+                lastName: item.lastName,
+                nickname: item.nickname,
+                status: item.status
+            };
 
-    const response = await fetch(webhookURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(allItems)
-    });
+            const response = await fetch(MAKE_WEBHOOK_URL, {
+                method: 'post',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
 
-    return await response.json();
-  } catch (err) {
-    console.error("Error sending data to Make:", err);
-    return { error: err.message };
-  }
+            responses.push(await response.json());
+        }
+
+        return { success: true, count: responses.length, details: responses };
+    } catch (error) {
+        console.error("Sync Error:", error);
+        return { success: false, error: error.message };
+    }
 }
