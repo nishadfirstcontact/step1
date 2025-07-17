@@ -1,0 +1,6 @@
+// dataService.jsw
+import wixData from 'wix-data';
+
+export async function getFullData() {
+    return await wixData.query("FullData").find();
+}
