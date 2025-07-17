@@ -1,37 +1,36 @@
-import { getFullData } from 'backend/dataService'; // Assume you create this service to fetch data
+// backend/syncToEditor.jsw
+
+import { getSecret } from 'wix-secrets-backend';
 import { fetch } from 'wix-fetch';
 
-// Replace with your Make.com webhook
-const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/8lujwdi4se7z0i89jiyrfb87vmtxf9qg";
-
-export async function syncToEditor() {
+export async function syncAllMembersToEditor() {
     try {
-        const data = await getFullData(); // You can also query directly here
-        const responses = [];
+        const webhookUrl = "https://hook.us2.make.com/8lujwdi4se7z0i89jiyrfb87vmtxf9qg";
 
-        for (let item of data.items) {
+        const { items } = await wixData.query("FullData").find();
+
+        for (const item of items) {
             const payload = {
-                loginEmail: item.loginEmail,
-                firstName: item.firstName,
-                lastName: item.lastName,
-                nickname: item.nickname,
-                status: item.status
+                loginEmail: item.loginEmail || "",
+                firstName: item.firstName || "",
+                lastName: item.lastName || "",
+                nickname: item.nickname || "",
+                status: item.status || "PENDING"
             };
 
-            const response = await fetch(MAKE_WEBHOOK_URL, {
-                method: 'post',
+            await fetch(webhookUrl, {
+                method: "post",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(payload)
             });
-
-            responses.push(await response.json());
         }
 
-        return { success: true, count: responses.length, details: responses };
-    } catch (error) {
-        console.error("Sync Error:", error);
-        return { success: false, error: error.message };
+        return { success: true, totalSent: items.length };
+
+    } catch (err) {
+        console.error("Sync error:", err);
+        return { success: false, error: err.message };
     }
 }
