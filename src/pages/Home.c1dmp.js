@@ -3,68 +3,41 @@ import wixData from 'wix-data';
 let selectedMentorId = null;
 
 $w.onReady(function () {
-    // Auto search as user types
+    console.log("nishad");
+
+    // Search input listener
     $w('#input1').onInput((event) => {
         performSearch(event.target.value.trim());
     });
 
-    // Repeater onItemReady
-    $w('#repeater1').onItemReady(($item, itemData, index) => {
-        // Reset styles
+    // Repeater item ready
+    $w('#repeater1').onItemReady(($item, itemData) => {
+        $item('#imageX13').src = itemData.photo;
+        $item('#text132').text = itemData.name;
+        $item('#text131').text = itemData.currentPosition;
+
         $item('#box182').style.backgroundColor = 'white';
 
         $item('#box182').onClick(() => {
             selectedMentorId = itemData._id;
 
-            // Reset all backgrounds
             $w('#repeater1').forEachItem(($innerItem) => {
                 $innerItem('#box182').style.backgroundColor = 'white';
             });
 
-            // Highlight clicked
             $item('#box182').style.backgroundColor = '#7f5af0';
-
-            // Show right panel
             showMentorDetails(itemData);
         });
     });
 
-    // Load all initially and select first
     loadAllMentors();
 
-    // Apply custom scroll styling to #box264 (scroll container)
-    const style = document.createElement("style");
-    style.innerHTML = `
-        /* --- Option 1: HIDE scrollbar --- */
-        #box264::-webkit-scrollbar {
-            display: none;
-        }
-        #box264 {
-            -ms-overflow-style: none;   /* IE and Edge */
-            scrollbar-width: none;      /* Firefox */
-            overflow-y: auto;           /* Enable scroll */
-        }
-
-        /* --- Option 2: VISIBLE styled scrollbar (comment above and uncomment below if needed) ---
-        #box264::-webkit-scrollbar {
-            width: 6px;
-        }
-        #box264::-webkit-scrollbar-thumb {
-            background-color: #7f5af0;
-            border-radius: 6px;
-        }
-        #box264 {
-            scrollbar-width: thin;
-            scrollbar-color: #7f5af0 transparent;
-            overflow-y: auto;
-        }
-        */
-    `;
-    document.head.appendChild(style);
+    // ✅ Apply overflow behavior without using document/head
+    $w('#box264').style.overflowY = "auto";
 });
 
 function loadAllMentors() {
-    wixData.query("Mentors")
+    wixData.query("Finance Mentors")
         .find()
         .then((results) => {
             if (results.items.length > 0) {
@@ -76,7 +49,7 @@ function loadAllMentors() {
 }
 
 function performSearch(searchValue) {
-    wixData.query("Mentors")
+    wixData.query("Finance Mentors")
         .find()
         .then((results) => {
             const allMentors = results.items;
@@ -88,7 +61,6 @@ function performSearch(searchValue) {
                 return;
             }
 
-            // Prioritize matching mentors at top
             const matching = allMentors.filter(m =>
                 m.name.toLowerCase().includes(searchValue.toLowerCase())
             );
@@ -97,10 +69,9 @@ function performSearch(searchValue) {
                 !m.name.toLowerCase().includes(searchValue.toLowerCase())
             );
 
-            const sorted = [...matching, ...rest]; // matching items first
+            const sorted = [...matching, ...rest];
             $w('#repeater1').data = sorted;
 
-            // Show first match details
             if (matching.length > 0) {
                 showMentorDetails(matching[0]);
                 highlightFirstItem(matching[0]._id);
@@ -110,33 +81,32 @@ function performSearch(searchValue) {
 
 function showMentorDetails(itemData) {
     // Desktop View
-    $w('#text110').text = itemData.name;
-    $w('#text109').text = itemData.designation;
-    $w('#text108').text = itemData.description;
-    $w('#text106').text = itemData.bio;
-    $w('#text102').text = itemData.availability;
-    $w('#text104').text = itemData.whoShouldReach;
-    $w('#imageX13').src = itemData.image;
+    $w('#imageX7').src = itemData.photo;
+    $w('#text128').text = itemData.name;
+    $w('#text129').text = itemData.currentPosition;
+    $w('#text110').text = itemData.areaOfExpertise;
+    $w('#text112').text = itemData.bio;
+    $w('#text114').text = itemData.whoShouldReach;
+    $w('#text116').text = itemData.availability;
+
+    if (itemData.linkedinProfile) $w('#button17').link = itemData.linkedinProfile;
+    if (itemData.email) $w('#button18').link = `mailto:${itemData.email}`;
 
     // Mobile View
-    $w('#text126').text = itemData.name;
-    $w('#text125').text = itemData.designation;
-    $w('#text124').text = itemData.description;
-    $w('#text122').text = itemData.bio;
-    $w('#text188').text = itemData.availability;
-    $w('#imageX17').src = itemData.image;
+    $w('#imageX16').src = itemData.photo;
+    $w('#text158').text = itemData.name;
+    $w('#text157').text = itemData.currentPosition;
+    $w('#text159').text = itemData.areaOfExpertise;
+    $w('#text163').text = itemData.bio;
+    $w('#text161').text = itemData.whoShouldReach;
+    $w('#text169').text = itemData.availability;
+
+    if (itemData.linkedinProfile) $w('#button26').link = itemData.linkedinProfile;
+    if (itemData.email) $w('#button25').link = `mailto:${itemData.email}`;
 }
 
 function highlightFirstItem(id) {
     $w('#repeater1').forEachItem(($item, itemData) => {
-        if (itemData._id === id) {
-            $item('#box182').style.backgroundColor = '#7f5af0';
-        } else {
-            $item('#box182').style.backgroundColor = 'white';
-        }
+        $item('#box182').style.backgroundColor = itemData._id === id ? '#7f5af0' : 'white';
     });
 }
-$w("#box264").style.backgroundColor = "#C7B6FF";
-
-
-
